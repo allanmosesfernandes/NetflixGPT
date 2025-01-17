@@ -1,10 +1,11 @@
-import './App.css'
+import Layout from './components/Layout';
+import './index.css';
 
 function App() {
 
   return (
       <>
-          <h1 className="text-3xl text-red-500 font-bold underline">Hello world!</h1>{' '}
+        <h2>Daft cunt </h2>
       </>
   );
 }
