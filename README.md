@@ -15,3 +15,8 @@
     `- Netflix GPT
     - Search Bar
     - Movie suggestions
+
+
+-Error codes
+ "code": 400,
+    "message": "EMAIL_EXISTS",
