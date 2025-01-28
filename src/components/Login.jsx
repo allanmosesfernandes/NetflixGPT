@@ -1,9 +1,11 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { auth } from '../utils/firebase';
 import { convertFirebaseErrorToStrings } from '../utils/helpers/strings';
 import { validateSignIn } from '../utils/validations';
 import Loader from './Loader';
+
 
 const Login = () => {
     // State
@@ -125,7 +127,7 @@ const Login = () => {
                     <p className="text-red-500 font-bold text-center">
                         {errorMessage}
                     </p>
-                    <p
+                    <Link
                         className="text-white text-center min-h-20 cursor-pointer"
                         onClick={toggleSignInForm}
                     >
@@ -136,7 +138,7 @@ const Login = () => {
                             Sign {signIn ? 'up' : 'in'} now
                         </span>
                         .
-                    </p>
+                    </Link>
                 </form>
             </div>
         </>
