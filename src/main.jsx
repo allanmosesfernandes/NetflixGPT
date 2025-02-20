@@ -1,9 +1,12 @@
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Browse from './components/Browse.jsx';
 import Layout from './components/Layout.jsx';
 import Login from './components/Login.jsx';
 import './index.css';
+import store from './utils/store.js';
+
 
 const router = createBrowserRouter([
   {
@@ -22,7 +25,8 @@ const router = createBrowserRouter([
   }
 ]);
 
-
 createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router} />
+  <Provider store={store}>
+    <RouterProvider router={router} />
+  </Provider>
 )
