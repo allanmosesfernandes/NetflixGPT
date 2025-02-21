@@ -17,18 +17,19 @@ const Layout = () => {
                 dispatch(addUser({uid: uid, email: email}));
                 navigate('/browse')
             }else {
-                dispatch(removeUser)
+                dispatch(removeUser);
+                navigate('/');
             }
         })
     }, [])
 
     return (
-        <>
+        <div>
             {user && <Header />}
             <main>
                 <Outlet />
             </main>
-        </>
+        </div>
     );
 };
 
