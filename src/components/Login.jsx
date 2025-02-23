@@ -1,11 +1,16 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    updateProfile
+} from 'firebase/auth';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { auth } from '../utils/firebase';
 import { convertFirebaseErrorToStrings } from '../utils/helpers/strings';
-import { validateSignIn } from '../utils/validations';
+import { validateSignUp } from '../utils/validations';
 import Loader from './Loader';
-
+import { useDispatch } from 'react-redux';
+import { addUser } from '../utils/userSlice';
 
 const Login = () => {
     // State
@@ -15,6 +20,9 @@ const Login = () => {
 
     // Refs
     const formRef = useRef(null);
+
+    // Reducers
+    const dispatch = useDispatch();
 
     // Handlers
     const toggleValidatingLogin = () => setValidatingLogin(!validatingLogin);
@@ -27,46 +35,61 @@ const Login = () => {
 
     const handleFormSubmission = (e) => {
         e.preventDefault();
-        toggleValidatingLogin();
-        // Sign up logic
         const formElements = formRef.current.elements;
         const email = formElements.email.value;
         const password = formElements.password.value;
         const name = formElements.name ? formElements.name.value : null;
-        const errorMessage = validateSignIn(email, password, name);
-        setErrorMessage(errorMessage);
-        if (errorMessage === null) {
-            if (!signIn) {
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // Signed up
-                    const user = userCredential.user;
-                    console.log('USER', user);
-                    // ...
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    setErrorMessage(
-                        convertFirebaseErrorToStrings(errorCode)
-                    );
-                    // ..
-                });
-            } else {
-                signInWithEmailAndPassword(auth, email, password)
+        // Sign up logic
+        if (!signIn) {
+            const validationErrors = validateSignUp(email, password, name);
+            setErrorMessage(validationErrors);
+            if (!validationErrors) {
+                toggleValidatingLogin();
+                createUserWithEmailAndPassword(auth, email, password, name)
                     .then((userCredential) => {
-                        // Signed in
+                        // Signed up
                         const user = userCredential.user;
-                        console.log('USER SIGNED IN', user);
-                        // ...
+                        console.log('USER WAS CREATED', user);
+                        updateProfile(auth.currentUser, {
+                            displayName: name,
+                            photoURL:
+                                'https://occ-0-4173-299.1.nflxso.net/dnm/api/v6/vN7bi_My87NPKvsBoib006Llxzg/AAAABTZ2zlLdBVC05fsd2YQAR43J6vB1NAUBOOrxt7oaFATxMhtdzlNZ846H3D8TZzooe2-FT853YVYs8p001KVFYopWi4D4NXM.png?r=229'
+                        }).then(() => {
+                            const { uid, email, displayName } = user;
+                            dispatch(
+                                addUser({
+                                    uid: uid,
+                                    email: email,
+                                    displayName: displayName
+                                })
+                            );
+                        });
                     })
                     .catch((error) => {
                         const errorCode = error.code;
                         const errorMessage = error.message;
+                        setErrorMessage(
+                            convertFirebaseErrorToStrings(errorCode)
+                        );
+                        // ..
                     });
             }
         }
-        setValidatingLogin(false);
+        if (signIn) {
+            toggleValidatingLogin();
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    console.log('USER SIGNED IN', user);
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    console.log(errorCode);
+                    setErrorMessage(convertFirebaseErrorToStrings(errorCode));
+                });
+            setValidatingLogin(false);
+        }
     };
 
     return (
@@ -78,7 +101,7 @@ const Login = () => {
                     className="bg-opacity-70 bg-black p-10 flex flex-col gap-6 w-3/12 justify-center"
                     ref={formRef}
                     onSubmit={handleFormSubmission}
-                    autoComplete='off'
+                    autoComplete="off"
                 >
                     <h2 className="text-white text-3xl font-bold">
                         {signIn ? 'Sign In' : 'Sign Up'}

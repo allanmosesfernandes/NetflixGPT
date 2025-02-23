@@ -10,18 +10,22 @@ const Layout = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user = useSelector((state) => state.user);
+
     useEffect(() => {
-        onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                const {uid, email } = user
-                dispatch(addUser({uid: uid, email: email}));
-                navigate('/browse')
-            }else {
-                dispatch(removeUser);
-                navigate('/');
+                const { uid, email, displayName } = user;
+                dispatch(addUser({ uid, email, displayName }));
+                navigate('/browse', { replace: true });
+            } else {
+                dispatch(removeUser());
+                navigate('/', { replace: true });
             }
-        })
-    }, [])
+        });
+
+        // Cleanup function to unsubscribe from the listener when the component unmounts
+        return unsubscribe;
+    }, []);
 
     return (
         <div>

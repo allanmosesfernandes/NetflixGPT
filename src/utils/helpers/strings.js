@@ -1,6 +1,8 @@
 function convertFirebaseErrorToStrings(errorMessage) {
-    console.log(errorMessage)
-    switch (errorMessage) {
+
+    const errorMessages = errorMessage;
+    console.log(errorMessages)
+    switch (errorMessages) {
         case 'auth/email-already-in-use':
             return 'Email already exists';
         case 'OPERATION_NOT_ALLOWED':
@@ -15,6 +17,8 @@ function convertFirebaseErrorToStrings(errorMessage) {
             return 'No user found with this email.';
         case 'INVALID_PASSWORD':
             return 'The password is invalid. Please try again.';
+        case 'auth/invalid-credential':
+            return 'Invalid login credentials';
         // Add any additional Firebase error codes as needed
         default:
             return 'An unexpected error occurred. Please try again.';
